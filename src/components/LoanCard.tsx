@@ -103,27 +103,27 @@ export const LoanCard: React.FC<LoanCardProps> = ({
       </div>
 
       {/* Right Section: Actions */}
-      <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+      <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-start md:justify-end">
         <button 
           onClick={onEdit}
-          className="flex items-center gap-2 px-3 py-1.5 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors border border-gray-200"
+          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors border border-gray-200"
         >
           <Pencil className="w-3.5 h-3.5" />
-          Изменить
+          <span className="md:inline">Изменить</span>
         </button>
         <button 
           onClick={onDelete}
-          className="flex items-center gap-2 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors border border-red-100"
+          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors border border-red-100"
         >
           <Trash2 className="w-3.5 h-3.5" />
-          Удалить
+          <span className="md:inline">Удалить</span>
         </button>
         <button 
           onClick={onMonthlyPayment}
-          className="flex items-center gap-2 px-3 py-1.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-blue-200"
+          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-blue-200"
         >
           <CreditCard className="w-3.5 h-3.5" />
-          Оплатить месяц
+          <span className="whitespace-nowrap">Оплатить месяц</span>
         </button>
         <button 
           onClick={(e) => {
@@ -131,10 +131,10 @@ export const LoanCard: React.FC<LoanCardProps> = ({
             e.stopPropagation();
             onExtraPayment();
           }}
-          className="flex items-center gap-2 px-3 py-1.5 text-white bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-green-200 cursor-pointer relative z-10"
+          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-white bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-green-200 cursor-pointer relative z-10"
         >
           <Plus className="w-3.5 h-3.5" />
-          Доп. платёж
+          <span className="whitespace-nowrap">Доп. платёж</span>
         </button>
       </div>
     </div>

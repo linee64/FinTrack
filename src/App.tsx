@@ -12,7 +12,7 @@ function App() {
     <div className="min-h-screen bg-gray-50 font-sans relative">
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
       
-      <main className="max-w-7xl mx-auto px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-4 md:px-8 md:py-8">
         <div className="animate-in fade-in zoom-in-95 duration-300">
           {activeTab === 'dashboard' && <Dashboard />}
           {activeTab === 'expenses' && <Expenses />}

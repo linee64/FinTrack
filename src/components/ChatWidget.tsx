@@ -165,7 +165,7 @@ export const ChatWidget: React.FC = () => {
       "fixed z-[100] transition-all duration-300 ease-in-out bg-gray-50 flex flex-col shadow-2xl overflow-hidden",
       isFullScreen 
         ? "inset-0 rounded-none" 
-        : "bottom-8 right-8 w-[320px] h-[480px] rounded-2xl border border-gray-200"
+        : "bottom-8 right-8 w-[calc(100vw-4rem)] max-w-[320px] h-[480px] rounded-2xl border border-gray-200"
     )}>
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex items-center justify-between flex-shrink-0">
