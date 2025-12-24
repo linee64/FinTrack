@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, ShoppingBag, Car, GraduationCap, Coffee, MessageCircle } from 'lucide-react';
+import { Plus, ShoppingBag, Car, GraduationCap, Coffee } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 export const Expenses: React.FC = () => {

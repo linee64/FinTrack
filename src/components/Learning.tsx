@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, ThumbsUp, MessageCircle, Clock, Calendar, Video, BookOpen, PenTool, Users } from 'lucide-react';
+import { MessageSquare, ThumbsUp, MessageCircle, Clock, Calendar, Video, BookOpen, Users } from 'lucide-react';
 import { CreatePostModal } from './CreatePostModal';
 
 export const Learning: React.FC = () => {

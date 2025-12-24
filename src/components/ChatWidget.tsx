@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Maximize2, Minimize2, Send, Sparkles, Key } from 'lucide-react';
+import { MessageCircle, X, Maximize2, Minimize2, Send, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
@@ -22,8 +22,8 @@ export const ChatWidget: React.FC = () => {
     },
   ]);
   const [inputValue, setInputValue] = useState('');
-  const [apiKey, setApiKey] = useState(import.meta.env.VITE_GEMINI_API_KEY || '');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(!import.meta.env.VITE_GEMINI_API_KEY);
+  const [apiKey] = useState(import.meta.env.VITE_GEMINI_API_KEY || '');
+  // const [showApiKeyInput, setShowApiKeyInput] = useState(!import.meta.env.VITE_GEMINI_API_KEY);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +45,7 @@ export const ChatWidget: React.FC = () => {
         sender: 'ai',
         timestamp: new Date(),
       }]);
-      setShowApiKeyInput(true);
+      // setShowApiKeyInput(true);
       return;
     }
 
@@ -70,7 +70,7 @@ export const ChatWidget: React.FC = () => {
       ];
 
       let result;
-      let modelUsed = '';
+      // let modelUsed = '';
       const errors = [];
 
       // Try models sequentially until one works
@@ -84,7 +84,7 @@ export const ChatWidget: React.FC = () => {
           Вопрос пользователя: ${userMessage.text}`;
 
           result = await model.generateContent(prompt);
-          modelUsed = modelName;
+          // modelUsed = modelName;
           break; // If successful, exit loop
         } catch (e: any) {
           console.warn(`Failed to use model ${modelName}:`, e.message);
@@ -130,7 +130,7 @@ export const ChatWidget: React.FC = () => {
       setMessages((prev) => [...prev, errorMessage]);
       
       // Always show API input on error to allow user to fix/change key
-      setShowApiKeyInput(true);
+      // setShowApiKeyInput(true);
     } finally {
       setIsLoading(false);
     }

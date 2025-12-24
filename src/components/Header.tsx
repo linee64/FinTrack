@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Wallet, GraduationCap, User } from 'lucide-react';
+import { LayoutDashboard, Wallet, GraduationCap } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'dashboard' | 'expenses' | 'learning';

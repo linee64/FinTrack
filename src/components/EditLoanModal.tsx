@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Check } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { cn } from '../lib/utils';
 import type { Loan } from '../models';
 
