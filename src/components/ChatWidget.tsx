@@ -77,7 +77,7 @@ export const ChatWidget: React.FC = () => {
       for (const modelName of modelsToTry) {
         try {
           const model = genAI.getGenerativeModel({ model: modelName });
-          const prompt = `Ты финансовый помощник в приложении FinTrack.kz. 
+          const prompt = `Ты финансовый помощник в приложении KAPITAL.AI. 
           Твоя задача - помогать пользователям с финансовыми вопросами, кредитами и накоплениями.
           Отвечай кратко, вежливо и по делу. Используй форматирование Markdown где уместно.
           

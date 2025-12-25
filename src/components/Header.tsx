@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
           <div className="bg-blue-600 p-1.5 rounded-lg">
             <Wallet className="w-5 h-5 text-white" />
           </div>
-          <span className="font-bold text-lg text-gray-900">FinTrack KZ</span>
+          <span className="font-bold text-lg text-gray-900">KAPITAL.AI</span>
         </div>
         
         {/* Mobile User Profile (visible only on mobile) */}
