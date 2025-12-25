@@ -92,7 +92,7 @@ export const LoanCard: React.FC<LoanCardProps> = ({
              </div>
              <div className="flex gap-1">
                 <span>Осталось:</span>
-                <span className="font-medium text-blue-600">{formatMoney(remainingAmount)}</span>
+                <span className="font-medium text-gray-900">{formatMoney(remainingAmount)}</span>
              </div>
              <div className="flex gap-1">
                 <span>Ежемесячный платёж:</span>

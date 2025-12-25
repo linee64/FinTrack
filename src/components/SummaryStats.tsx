@@ -35,7 +35,7 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({ loans }) => {
         <h3 className="text-gray-500 text-sm font-medium mb-4">Осталось погасить</h3>
         <p className="text-2xl font-bold text-gray-900 mb-2">{formatMoney(remainingAmount)}</p>
         <p className="text-sm text-green-600 font-medium">
-          Погашено: <span className="text-green-600">{formatMoney(paidAmount)}</span>
+          Погашено: <span className="text-gray-900">{formatMoney(paidAmount)}</span>
         </p>
       </div>
 

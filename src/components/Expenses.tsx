@@ -328,7 +328,7 @@ export const Expenses: React.FC = () => {
                   <p className="text-xs text-gray-400 mt-0.5">{item.category} • {item.date}</p>
                 </div>
               </div>
-              <span className={`font-bold ${item.iconColor}`}>{formatMoney(item.amount)}</span>
+              <span className="font-bold text-gray-900">{formatMoney(item.amount)}</span>
             </div>
           ))}
         </div>

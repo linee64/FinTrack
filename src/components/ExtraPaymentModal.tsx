@@ -21,12 +21,13 @@ export const ExtraPaymentModal: React.FC<ExtraPaymentModalProps> = ({
   currentRemaining,
   onApply,
 }) => {
-  const [amount, setAmount] = useState<number>(10000);
+  const [amount, setAmount] = useState<string>('10000');
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      setAmount('10000');
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
@@ -35,10 +36,11 @@ export const ExtraPaymentModal: React.FC<ExtraPaymentModalProps> = ({
 
   if (!isVisible) return null;
 
-  const newRemaining = Math.max(0, currentRemaining - amount);
+  const parsedAmount = Number(amount) || 0;
+  const newRemaining = Math.max(0, currentRemaining - parsedAmount);
   // Mock calculations for savings
-  const monthsSaved = Math.max(1, Math.floor(amount / 10000));
-  const interestSaved = Math.floor(amount * 0.25); // Mock 25% saving
+  const monthsSaved = Math.max(1, Math.floor(parsedAmount / 10000));
+  const interestSaved = Math.floor(parsedAmount * 0.25); // Mock 25% saving
 
   return (
     <div className={cn(
@@ -86,18 +88,18 @@ export const ExtraPaymentModal: React.FC<ExtraPaymentModalProps> = ({
               <input
                 type="number"
                 value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
+                onChange={(e) => setAmount(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
               />
               <div className="absolute right-0 top-0 bottom-0 flex flex-col border-l border-gray-200">
                 <button 
-                   onClick={() => setAmount(prev => prev + 1000)}
+                   onClick={() => setAmount(prev => String(Number(prev) + 1000))}
                    className="flex-1 px-3 hover:bg-gray-100 transition-colors flex items-center justify-center text-gray-500"
                 >
                   ▲
                 </button>
                 <button 
-                   onClick={() => setAmount(prev => Math.max(0, prev - 1000))}
+                   onClick={() => setAmount(prev => String(Math.max(0, Number(prev) - 1000)))}
                    className="flex-1 px-3 hover:bg-gray-100 transition-colors flex items-center justify-center text-gray-500"
                 >
                   ▼
@@ -132,7 +134,7 @@ export const ExtraPaymentModal: React.FC<ExtraPaymentModalProps> = ({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Доп. платёж</span>
-              <span className="font-medium text-green-600">-{formatMoney(amount)}</span>
+              <span className="font-medium text-green-600">-{formatMoney(parsedAmount)}</span>
             </div>
             <div className="h-px bg-gray-200 my-2" />
             <div className="flex justify-between text-base">
@@ -150,7 +152,7 @@ export const ExtraPaymentModal: React.FC<ExtraPaymentModalProps> = ({
               Отмена
             </button>
             <button
-              onClick={() => onApply(amount)}
+              onClick={() => onApply(parsedAmount)}
               className="flex-1 px-4 py-3 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 shadow-lg shadow-green-200 transition-all hover:shadow-xl hover:-translate-y-0.5"
             >
               Применить платёж
