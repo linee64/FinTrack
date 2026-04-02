@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Maximize2, Minimize2, Send, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { useFinancialData } from '../lib/FinancialContext';
 
 type Message = {
   id: number;
@@ -11,19 +12,19 @@ type Message = {
 };
 
 export const ChatWidget: React.FC = () => {
+  const { loans, expenses } = useFinancialData();
   const [isOpen, setIsOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: 'Привет! Я ваш финансовый помощник. Чем могу помочь сегодня?',
+      text: 'Привет! Я ваш финансовый помощник. Я проанализировал ваши текущие расходы и кредиты. Чем могу помочь сегодня?',
       sender: 'ai',
       timestamp: new Date(),
     },
   ]);
   const [inputValue, setInputValue] = useState('');
   const [apiKey] = useState(import.meta.env.VITE_GEMINI_API_KEY || '');
-  // const [showApiKeyInput, setShowApiKeyInput] = useState(!import.meta.env.VITE_GEMINI_API_KEY);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +46,6 @@ export const ChatWidget: React.FC = () => {
         sender: 'ai',
         timestamp: new Date(),
       }]);
-      // setShowApiKeyInput(true);
       return;
     }
 
@@ -62,29 +62,47 @@ export const ChatWidget: React.FC = () => {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey.trim());
-      
-      // Simplified model list - using the most standard ones first
+
+      // Simplified model list
       const modelsToTry = [
-        "gemini-1.5-flash",
+        "gemini-2.5-flash-lite",
         "gemini-pro"
       ];
 
       let result;
-      // let modelUsed = '';
       const errors = [];
+
+      // Format financial data for context
+      const loansContext = loans.map(l => `- ${l.title}: долг ${l.remainingAmount} ₸, платеж ${l.monthlyPayment} ₸, ставка ${l.interestRate}%`).join('\n');
+      const expensesContext = expenses.map(e => `- ${e.title} (${e.category}): ${e.amount} ₸, дата ${e.date}`).join('\n');
 
       // Try models sequentially until one works
       for (const modelName of modelsToTry) {
         try {
           const model = genAI.getGenerativeModel({ model: modelName });
-          const prompt = `Ты финансовый помощник в приложении KAPITAL.AI. 
-          Твоя задача - помогать пользователям с финансовыми вопросами, кредитами и накоплениями.
-          Отвечай кратко, вежливо и по делу. Используй форматирование Markdown где уместно.
-          
-          Вопрос пользователя: ${userMessage.text}`;
+          const prompt = `Ты — финансовый эксперт-аналитик KAPITAL.AI. Твоя специализация — рынок Казахстана.
+
+КОНТЕКСТ ПОЛЬЗОВАТЕЛЯ:
+Кредиты:
+${loansContext || 'Кредитов нет'}
+
+Последние расходы:
+${expensesContext || 'Расходов нет'}
+
+ВАЖНЫЕ ПРАВИЛА:
+1. ВАЛЮТА: Используй ТОЛЬКО Тенге (₸) или "тг". Никогда не упоминай рубли (₽).
+2. АНАЛИЗ В РЕЖИМЕ РЕАЛЬНОГО ВРЕМЕНИ: Если пользователь спрашивает про свои расходы, проанализируй данные выше. Обрати внимание на самые крупные категории трат и дай персональный совет по экономии.
+3. СТРУКТУРА:
+   - Используй заголовки (###) для разделения тем.
+   - Используй маркированные списки (*) для перечисления шагов.
+   - Выделяй жирным (**текст**) важные цифры и понятия.
+   - Разделяй блоки текста пустой строкой.
+
+Будь вежлив, конкретен и профессионален. Твоя цель — финансовое благополучие пользователя в Казахстане.
+
+Вопрос пользователя: ${userMessage.text}`;
 
           result = await model.generateContent(prompt);
-          // modelUsed = modelName;
           break; // If successful, exit loop
         } catch (e: any) {
           console.warn(`Failed to use model ${modelName}:`, e.message);
@@ -100,7 +118,7 @@ export const ChatWidget: React.FC = () => {
 
       const response = await result.response;
       const text = response.text();
-      
+
       const aiMessage: Message = {
         id: Date.now() + 1,
         text: text,
@@ -110,16 +128,9 @@ export const ChatWidget: React.FC = () => {
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error: any) {
       console.error('Gemini API Error:', error);
-      
       let errorText = 'Извините, произошла ошибка при обращении к AI.';
-      
-      if (error.message?.includes('429')) {
-        errorText = 'Превышен лимит запросов (Quota Exceeded). Попробуйте позже.';
-      } else if (error.message?.includes('404')) {
-        errorText = 'Ошибка 404: Модели AI недоступны для вашего ключа. Убедитесь, что вы используете ключ из Google AI Studio (не Vertex AI).';
-      } else if (error.message?.includes('API key')) {
-        errorText = 'Неверный API ключ. Пожалуйста, проверьте его.';
-      }
+      if (error.message?.includes('429')) errorText = 'Превышен лимит запросов. Попробуйте позже.';
+      else if (error.message?.includes('API key')) errorText = 'Неверный API ключ.';
 
       const errorMessage: Message = {
         id: Date.now() + 1,
@@ -128,9 +139,6 @@ export const ChatWidget: React.FC = () => {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
-      
-      // Always show API input on error to allow user to fix/change key
-      // setShowApiKeyInput(true);
     } finally {
       setIsLoading(false);
     }
@@ -150,7 +158,7 @@ export const ChatWidget: React.FC = () => {
   if (!isOpen) {
     return (
       <div className="fixed bottom-8 right-8 z-[100]">
-        <button 
+        <button
           onClick={() => setIsOpen(true)}
           className="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-purple-300 hover:bg-purple-700 transition-all hover:-translate-y-1 hover:scale-105"
         >
@@ -163,8 +171,8 @@ export const ChatWidget: React.FC = () => {
   return (
     <div className={cn(
       "fixed z-[100] transition-all duration-300 ease-in-out bg-gray-50 flex flex-col shadow-2xl overflow-hidden",
-      isFullScreen 
-        ? "inset-0 rounded-none" 
+      isFullScreen
+        ? "inset-0 rounded-none"
         : "bottom-8 right-8 w-[calc(100vw-4rem)] max-w-[320px] h-[480px] rounded-2xl border border-gray-200"
     )}>
       {/* Header */}
@@ -177,13 +185,13 @@ export const ChatWidget: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={() => setIsFullScreen(!isFullScreen)}
             className="p-1.5 hover:bg-white/20 rounded-lg text-white transition-colors"
           >
             {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
-          <button 
+          <button
             onClick={() => setIsOpen(false)}
             className="p-1.5 hover:bg-white/20 rounded-lg text-white transition-colors"
           >
@@ -195,8 +203,8 @@ export const ChatWidget: React.FC = () => {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f8f9fa]">
         {messages.map((msg) => (
-          <div 
-            key={msg.id} 
+          <div
+            key={msg.id}
             className={cn(
               "flex w-full",
               msg.sender === 'user' ? "justify-end" : "justify-start"
@@ -204,8 +212,8 @@ export const ChatWidget: React.FC = () => {
           >
             <div className={cn(
               "max-w-[80%] rounded-2xl p-3 text-sm leading-relaxed shadow-sm",
-              msg.sender === 'user' 
-                ? "bg-blue-600 text-white rounded-br-none" 
+              msg.sender === 'user'
+                ? "bg-blue-600 text-white rounded-br-none"
                 : "bg-white text-gray-800 rounded-bl-none border border-gray-100"
             )}>
               {msg.sender === 'ai' && (
@@ -214,7 +222,28 @@ export const ChatWidget: React.FC = () => {
                   AI Assistant
                 </div>
               )}
-              {msg.text}
+              <div className="whitespace-pre-wrap break-words prose prose-sm max-w-none">
+                {msg.text.split('\n').map((line, lineIndex) => {
+                  // Handle Headers ###
+                  if (line.startsWith('###')) {
+                    return <h4 key={lineIndex} className="text-sm font-bold mt-3 mb-1 text-purple-800">{line.replace('###', '').trim()}</h4>;
+                  }
+                  
+                  // Handle Bullets * or -
+                  const isBullet = line.trim().startsWith('* ') || line.trim().startsWith('- ');
+                  
+                  return (
+                    <div key={lineIndex} className={cn(isBullet ? "pl-4 -indent-4 mb-1" : "mb-2")}>
+                      {line.split(/(\*\*.*?\*\*)/g).map((part, i) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={i} className={cn(msg.sender === 'ai' ? "text-purple-700" : "text-white")}>{part.slice(2, -2)}</strong>;
+                        }
+                        return <span key={i}>{part}</span>;
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         ))}
@@ -246,7 +275,7 @@ export const ChatWidget: React.FC = () => {
             placeholder="Напишите ваш вопрос..."
             className="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           />
-          <button 
+          <button
             onClick={handleSendMessage}
             disabled={!inputValue.trim()}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

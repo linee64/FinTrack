@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Plus, ShoppingBag, Car, GraduationCap, Coffee } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { useFinancialData } from '../lib/FinancialContext';
 
 export const Expenses: React.FC = () => {
+  const { expenses: history, addExpense } = useFinancialData();
   const [activePeriod, setActivePeriod] = useState<'day' | 'week' | 'month'>('day');
-
-  // Donut chart data is now calculated dynamically
-  // const donutData = [ ... ];
 
   // Mock data for bar chart
   const barData = [
@@ -19,61 +18,6 @@ export const Expenses: React.FC = () => {
     { name: 'Вс', value: 6000 },
   ];
 
-  // Mock history data
-  const historyData = [
-    {
-      id: 1,
-      title: 'Продукты в магазине',
-      category: 'Еда',
-      date: '2025-11-07',
-      amount: 15000,
-      icon: ShoppingBag,
-      iconColor: 'text-blue-500',
-      bgColor: 'bg-blue-50',
-    },
-    {
-      id: 2,
-      title: 'Бензин',
-      category: 'Транспорт',
-      date: '2025-11-06',
-      amount: 8000,
-      icon: Car,
-      iconColor: 'text-purple-500',
-      bgColor: 'bg-purple-50',
-    },
-    {
-      id: 3,
-      title: 'Онлайн курс',
-      category: 'Образование',
-      date: '2025-11-05',
-      amount: 25000,
-      icon: GraduationCap,
-      iconColor: 'text-emerald-500',
-      bgColor: 'bg-emerald-50',
-    },
-    {
-      id: 4,
-      title: 'Ресторан',
-      category: 'Еда',
-      date: '2025-11-04',
-      amount: 12000,
-      icon: ShoppingBag,
-      iconColor: 'text-blue-500',
-      bgColor: 'bg-blue-50',
-    },
-    {
-      id: 5,
-      title: 'Кофе',
-      category: 'Развлечения',
-      date: '2025-11-03',
-      amount: 5000,
-      icon: Coffee,
-      iconColor: 'text-rose-500',
-      bgColor: 'bg-rose-50',
-    },
-  ];
-
-  const [history, setHistory] = useState(historyData);
   const [newExpense, setNewExpense] = useState({
     amount: '',
     category: 'Выберите',
@@ -107,45 +51,12 @@ export const Expenses: React.FC = () => {
   const handleAddExpense = () => {
     if (!newExpense.amount || newExpense.category === 'Выберите') return;
 
-    let icon = ShoppingBag;
-    let iconColor = 'text-gray-500';
-    let bgColor = 'bg-gray-50';
-
-    switch (newExpense.category) {
-      case 'Еда':
-        icon = ShoppingBag;
-        iconColor = 'text-blue-500';
-        bgColor = 'bg-blue-50';
-        break;
-      case 'Транспорт':
-        icon = Car;
-        iconColor = 'text-purple-500';
-        bgColor = 'bg-purple-50';
-        break;
-      case 'Образование':
-        icon = GraduationCap;
-        iconColor = 'text-emerald-500';
-        bgColor = 'bg-emerald-50';
-        break;
-      case 'Развлечения':
-        icon = Coffee;
-        iconColor = 'text-rose-500';
-        bgColor = 'bg-rose-50';
-        break;
-    }
-
-    const newItem = {
-      id: Date.now(),
+    addExpense({
       title: newExpense.description || newExpense.category,
       category: newExpense.category,
-      date: new Date().toISOString().split('T')[0],
       amount: Number(newExpense.amount),
-      icon,
-      iconColor,
-      bgColor,
-    };
+    });
 
-    setHistory([newItem, ...history]);
     setNewExpense({ amount: '', category: 'Выберите', description: '' });
   };
 

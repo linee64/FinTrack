@@ -3,74 +3,11 @@ import { Plus } from 'lucide-react';
 import { SummaryStats } from './SummaryStats';
 import { LoanList } from './LoanList';
 import { AddLoanModal } from './AddLoanModal';
-import type { Loan } from '../models';
+import { useFinancialData } from '../lib/FinancialContext';
 
 export const Dashboard: React.FC = () => {
-  const [loans, setLoans] = useState<Loan[]>([
-    {
-      id: 1,
-      title: 'Ипотека',
-      subtitle: 'Квартира в Алматы',
-      totalAmount: 15000000,
-      remainingAmount: 12500000,
-      monthlyPayment: 150000,
-      interestRate: 12.5,
-      term: 15,
-      termUnit: 'years',
-      progress: 17,
-      color: '#3b82f6', // blue-500
-    },
-    {
-      id: 2,
-      title: 'Автокредит',
-      subtitle: 'Toyota Camry',
-      totalAmount: 5000000,
-      remainingAmount: 3200000,
-      monthlyPayment: 85000,
-      interestRate: 18.0,
-      term: 5,
-      termUnit: 'years',
-      progress: 36,
-      color: '#3b82f6',
-    },
-    {
-      id: 3,
-      title: 'Потребительский кредит',
-      subtitle: 'Ремонт',
-      totalAmount: 1000000,
-      remainingAmount: 450000,
-      monthlyPayment: 45000,
-      interestRate: 22.5,
-      term: 24,
-      termUnit: 'months',
-      progress: 55,
-      color: '#3b82f6',
-    },
-  ]);
+  const { loans, addLoan, updateLoan, deleteLoan } = useFinancialData();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-  const handleAddLoan = (newLoanData: Omit<Loan, 'id' | 'progress' | 'color'>) => {
-    const newId = Math.max(...loans.map(l => l.id), 0) + 1;
-    const newLoan: Loan = {
-      ...newLoanData,
-      id: newId,
-      progress: 0,
-      remainingAmount: newLoanData.totalAmount,
-      color: '#3b82f6',
-    };
-    setLoans(prevLoans => [...prevLoans, newLoan]);
-    setIsAddModalOpen(false);
-  };
-
-  const handleUpdateLoan = (updatedLoan: Loan) => {
-    setLoans(prevLoans => prevLoans.map(loan => 
-      loan.id === updatedLoan.id ? updatedLoan : loan
-    ));
-  };
-
-  const handleDeleteLoan = (loanId: number) => {
-    setLoans(prevLoans => prevLoans.filter(loan => loan.id !== loanId));
-  };
 
   return (
     <>
@@ -95,14 +32,14 @@ export const Dashboard: React.FC = () => {
       {/* Loan List */}
       <LoanList 
         loans={loans} 
-        onUpdateLoan={handleUpdateLoan} 
-        onDeleteLoan={handleDeleteLoan}
+        onUpdateLoan={updateLoan} 
+        onDeleteLoan={deleteLoan}
       />
 
       <AddLoanModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSave={handleAddLoan}
+        onSave={addLoan}
       />
     </>
   );
